@@ -1,6 +1,6 @@
 import uvicorn
 import os
-print(os.getenv("mongo_con", "mongodb://localhost:27017"), "ofnonfonfon")
+print(os.getenv("mongo_con"), "ofnonfonfon")
 
 if __name__ == "__main__":
     uvicorn.run(
