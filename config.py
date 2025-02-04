@@ -7,7 +7,8 @@ class MongoDBClient:
     _instance = None  # Singleton instance
     _lock = Lock()  # Lock for thread safety
 
-    def __new__(cls, uri=os.getenv("mongo_con", "mongodb://localhost:27017"), database="hashiras"): # TODO: fetch database name from config
+    def __new__(cls, database="hashiras"): # TODO: fetch database name from config
+        uri=os.getenv("mongo_con", "mongodb://localhost:27017")
         print(os.getenv("mongo_con", "mongodb://localhost:27017"), "ofnonfonfon")
         if not cls._instance:
             with cls._lock:  # Ensure thread safety
