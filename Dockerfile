@@ -17,7 +17,7 @@ WORKDIR /bidding
 RUN apk add curl
 COPY --from=builder /bidding /bidding
 COPY --from=builder /.venv /.venv
-EXPOSE 80
+EXPOSE 8000
 
 
 ENV PATH="/.venv/bin:$PATH"
