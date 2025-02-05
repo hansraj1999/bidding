@@ -81,7 +81,7 @@ def start_server():
         for _bid in bids:
             del _bid["_id"]
         return {
-            "total": bid.count_documents({"status": filter}),
+            "total": bid.count_documents(query),
             "page": page,
             "limit": limit,
             "bids": bids
