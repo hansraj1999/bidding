@@ -105,6 +105,7 @@ def start_server():
         external_order_id: str = Field(None, description="External Order ID of the item")
         external_shipment_id: str = Field(None, description="External Shipment ID of the item")
         delivery_details: dict = Field(None, description="Delivery details of the item")
+        article_details: dict = Field(None, description="Article details of the item")
 
     import uuid
 
