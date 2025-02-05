@@ -118,7 +118,7 @@ def start_server():
         c = mongo_client.get_collection("company")
         cres = c.find_one({"company_id": company})
         if not cres:
-            return {"message": "Company not found"}
+            return {"message": "Company not found", "success": False}
         name = cres["name"]
         BidRequest["bid_id"] = str(uuid.uuid4())
         BidRequest["company_name"] = name
@@ -129,7 +129,7 @@ def start_server():
         res = bid.insert_one(
             BidRequest
         )
-        return {"message": "Bid created successfully", "bid_id": str(BidRequest["bid_id"])}
+        return {"message": "Bid created successfully", "bid_id": str(BidRequest["bid_id"]), "success": True}
 
     class AddBid(BaseModel):
         amount: float = Field(..., description="Amount for the bid")
@@ -296,7 +296,7 @@ def start_server():
         company = mongo_client.get_collection("company")
         res = company.find_one({"company_id": company_id})
         if res:
-            return {"message": "Company already registered"}
+            return {"message": "Company already registered", "success": False}
         print(company.insert_one(
             {
                 "mobile_number": request.mobile_number,
@@ -306,7 +306,7 @@ def start_server():
                 "rating": 0, "total_bids": 0, "total_wins": 0
             }
         ))
-        return True
+        return {"message": "Company registered", "success": True}
 
     @app.post("/register/{company_id}/phone")
     async def update_phone_number(company_id: int, mobile_number: str):
@@ -315,7 +315,7 @@ def start_server():
             "mobile_number": mobile_number,
             "updated_at": datetime.datetime.now()
         }}))
-        return True
+        return {"message": "Company registered", "success": True}
 
     class BankDetails(BaseModel):
         account_number: str = Field(..., description="account number")
