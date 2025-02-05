@@ -71,10 +71,13 @@ def start_server():
         else:
             skip = (page - 1) * limit
         print("oonogno", exclude_company_id, type(exclude_company_id))
+        query = {}
         if exclude_company_id:
-            bids = list(bid.find({"status": filter, "ordering_company_id": {"$ne": exclude_company_id}}).skip(skip).limit(limit))
+            query = {"status": filter, "ordering_company_id": {"$ne": exclude_company_id}}
         else:
-            bids = list(bid.find({"status": filter}).skip(skip).limit(limit))
+            query = {"status": filter}
+        print(query, "ofnfonfonf")
+        bids = list(bid.find(query)).skip(skip).limit(limit)
         for _bid in bids:
             del _bid["_id"]
         return {
