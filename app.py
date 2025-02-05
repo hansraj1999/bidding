@@ -111,7 +111,13 @@ def start_server():
         bid = mongo_client.get_collection("bid")
         print(BidRequest.dict())
         BidRequest = BidRequest.dict()
+        c = mongo_client.get_collection("company")
+        cres = c.find_one({"company_id": company})
+        if not cres:
+            return {"message": "Company not found"}
+        name = cres["name"]
         BidRequest["bid_id"] = str(uuid.uuid4())
+        BidRequest["company_name"] = name
         # BidRequest["applied_bids"] = []
         BidRequest["status"] = "active" # enum
         BidRequest["ordering_company_id"] = company
@@ -131,6 +137,11 @@ def start_server():
         try:
             bid = mongo_client.get_collection("bid")
             res = bid.find_one({"bid_id": bid_id})
+            c = mongo_client.get_collection("company")
+            cd = c.find_one({"company_id": company})
+            if not c.find_one({"company_id": company}):
+                return {"message": "Company not found"}
+            name = cd["name"]
 
             if not res:
                 return {"message": "Bid not found"}
@@ -145,7 +156,7 @@ def start_server():
             if applied_bids.find_one({"bid_id": bid_id, "company_id": company}):
                 return {"message": "Bid is already placed by you cant update it."} # current limitation
             applied_bids.insert_one(
-                {"bid_id": res["bid_id"], "company_id": company, "amount": request.amount, "status": "active"}
+                {"bid_id": res["bid_id"], "company_id": company, "amount": request.amount, "status": "active", "company_name": name}
             ) # ideally it should be in a separate collection, and race condition should be handled.
 
         except Exception as e:
@@ -174,7 +185,10 @@ def start_server():
         company.update_one({"company_id": winner_company_id}, {"$set": {
             "total_wins": company.find_one({"company_id": winner_company_id}).get("total_wins", 0) + 1
         }})
-        bid.update_one({"bid_id": bid_id}, {"$set": {"winner_company_id": winner_company_id, "status": "completed"}})
+        bid.update_one({"bid_id": bid_id}, {"$set": {"winner_company_id": winner_company_id, "status": "completed",
+        "ordering_company_name": res["company_name"],
+        "winnning_company_name": winner["company_name"],
+                                                     }})
         ledger = mongo_client.get_collection("ledger")
         ledger_id = str(uuid.uuid4())
         ledger.insert_one(
@@ -182,7 +196,9 @@ def start_server():
                 "item_id": res["item_id"],
                 "bid_id": bid_id,
                 "ordering_company_id": res["ordering_company_id"],
+                "ordering_company_name": res["company_name"],
                 "winner_company_id": winner_company_id,
+                "winnning_company_name": winner["company_name"],
                 "amount": winner["amount"],
                 "status": "active",
                 "ledger_id": ledger_id,
@@ -267,16 +283,29 @@ def start_server():
         return {"message": "Bid cancelled successfully"}
 
     @app.post("/register/{company_id}")
-    async def register_company(company_id: int, name: str = None, tennet="FYND"):
+    async def register_company(company_id: int, name: str, mobile_number: str, tennet="FYND"):
         company = mongo_client.get_collection("company")
+        res = company.find_one({"company_id": company_id})
+        if res:
+            return {"message": "Company already registered"}
         print(company.insert_one(
             {
+                "mobile_number": mobile_number,
                 "company_id": company_id, "name": name,
                 "tennet": tennet, "created_at": datetime.datetime.now(),
                 "updated_at": datetime.datetime.now(),
                 "rating": 0, "total_bids": 0, "total_wins": 0
             }
         ))
+        return True
+
+    @app.post("/register/{company_id}/phone")
+    async def update_phone_number(company_id: int, mobile_number: str):
+        company = mongo_client.get_collection("company")
+        print(company.update_one({"company_id": company_id}, {"$set": {
+            "mobile_number": mobile_number,
+            "updated_at": datetime.datetime.now()
+        }}))
         return True
 
     class BankDetails(BaseModel):
