@@ -129,7 +129,7 @@ def start_server():
         # BidRequest["applied_bids"] = []
         BidRequest["status"] = "active" # enum
         BidRequest["ordering_company_id"] = company
-
+        BidRequest["created_at"] = datetime.datetime.now()
         res = bid.insert_one(
             BidRequest
         )
