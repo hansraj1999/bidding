@@ -70,6 +70,7 @@ def start_server():
             skip = 0
         else:
             skip = (page - 1) * limit
+        print("oonogno", exclude_company_id, type(exclude_company_id))
         if exclude_company_id:
             bids = list(bid.find({"status": filter, "ordering_company_id": {"$ne": exclude_company_id}}).skip(skip).limit(limit))
         else:
