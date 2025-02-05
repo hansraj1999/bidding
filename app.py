@@ -187,6 +187,7 @@ def start_server():
                 return {"message": "Bid is already placed by you cant update it."} # current limitation
             applied_bids.insert_one(
                 {
+                    "id": str(uuid.uuid4()),
                     "is_winner": False,
                     "bid_id": res["bid_id"], "company_id": company, 
                     "amount": request.amount, "status": "active", "company_name": name,
