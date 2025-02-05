@@ -286,17 +286,22 @@ def start_server():
         logger.info(socket.gethostname())
         return {"message": "Bid cancelled successfully"}
 
+    class RegisterCompany(BaseModel):
+        name: str = Field(..., description="Name of the company")
+        mobile_number: str = Field(..., description="Mobile number of the company")
+        tennet: str = Field("FYND", description="Tennet of the company")
+
     @app.post("/register/{company_id}")
-    async def register_company(company_id: int, name: str, mobile_number: str, tennet="FYND"):
+    async def register_company(company_id: int, request: RegisterCompany):
         company = mongo_client.get_collection("company")
         res = company.find_one({"company_id": company_id})
         if res:
             return {"message": "Company already registered"}
         print(company.insert_one(
             {
-                "mobile_number": mobile_number,
-                "company_id": company_id, "name": name,
-                "tennet": tennet, "created_at": datetime.datetime.now(),
+                "mobile_number": request.mobile_number,
+                "company_id": company_id, "name": request.name,
+                "tennet": request.tennet, "created_at": datetime.datetime.now(),
                 "updated_at": datetime.datetime.now(),
                 "rating": 0, "total_bids": 0, "total_wins": 0
             }
