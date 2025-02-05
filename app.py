@@ -103,7 +103,7 @@ def start_server():
     @app.get("/{company_id}/bids/{bid_id}/applied")
     async def get_applied_bid_by_bid_id(company_id: int, bid_id: str):
         logger.info(socket.gethostname())
-        applied_bid = mongo_client.get_collection("applied_bid")
+        applied_bid = mongo_client.get_collection("applied_bids")
         res = applied_bid.find_one({"bid_id": bid_id, "company_id": company_id})
         if not res:
             return {}
