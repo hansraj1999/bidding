@@ -34,7 +34,7 @@ def start_server():
         return res
 
     @app.get("/{company_id}/bids")
-    async def bids_by_company_id(company_id: int, filter_type: str, limit: int = 10, page: int = 0):
+    async def bids_by_company_id(company_id: int, filter_type: str=None, limit: int = 10, page: int = 0):
         bid = mongo_client.get_collection("bid")
         if page < 1:
             skip = 0
@@ -66,7 +66,7 @@ def start_server():
         return res
 
     @app.get("/bids")
-    async def get_gloabl_bids(filter: str, limit: int = 10, page: int = 0, exclude_company_id: int = None):
+    async def get_gloabl_bids(filter: str=None, limit: int = 10, page: int = 0, exclude_company_id: int = None):
         logger.info(socket.gethostname())
         bid = mongo_client.get_collection("bid")
         if page < 1:
