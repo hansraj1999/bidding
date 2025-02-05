@@ -119,6 +119,9 @@ def start_server():
         cres = c.find_one({"company_id": company})
         if not cres:
             return {"message": "Company not found", "success": False}
+        sh = bid.find_one({"shipment_id": BidRequest["shipment_id"], "status": "active"})
+        if sh:
+            return {"message": "Bid already exists for this shipment", "success": False}
         name = cres["name"]
         BidRequest["bid_id"] = str(uuid.uuid4())
         BidRequest["company_name"] = name
