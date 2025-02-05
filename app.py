@@ -330,6 +330,8 @@ def start_server():
         ifsc: str = Field(..., description="ifsc code")
         bank_name: str = Field(..., description="bank name")
         vpa: str = Field(..., description="vpa")
+        account_type: str = Field(..., description="account type can be current or saving")
+        beneficiary_name: str = Field(..., description="benificary_name")
 
     @app.post("/register/{company_id}/banking")
     async def add_banking_details(company_id: int, BankDetails: BankDetails):
