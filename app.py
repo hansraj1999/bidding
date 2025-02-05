@@ -34,18 +34,21 @@ def start_server():
         return res
 
     @app.get("/{company_id}/bids")
-    async def bids_by_company_id(company_id: int, filter_type: str = "active", limit: int = 10, page: int = 0):
+    async def bids_by_company_id(company_id: int, filter_type: str, limit: int = 10, page: int = 0):
         bid = mongo_client.get_collection("bid")
         if page < 1:
             skip = 0
         else:
             skip = (page - 1) * limit
         print("fpfa", filter_type, company_id)
-        bids = list(bid.find({"status": filter_type, "ordering_company_id": company_id}).skip(skip).limit(limit))
+        query = {"ordering_company_id": company_id}
+        if filter_type:
+            query["status"] =  filter_type
+        bids = list(bid.find(query).skip(skip).limit(limit))
         for _bid in bids:
             del _bid["_id"]
         return {
-            "total": bid.count_documents({"status": filter_type, "ordering_company_id": company_id}),
+            "total": bid.count_documents(query),
             "page": page,
             "limit": limit,
             "bids": bids
@@ -63,7 +66,7 @@ def start_server():
         return res
 
     @app.get("/bids")
-    async def get_gloabl_bids(filter: str ="active", limit: int = 10, page: int = 0, exclude_company_id: int = None):
+    async def get_gloabl_bids(filter: str, limit: int = 10, page: int = 0, exclude_company_id: int = None):
         logger.info(socket.gethostname())
         bid = mongo_client.get_collection("bid")
         if page < 1:
@@ -73,9 +76,9 @@ def start_server():
         print("oonogno", exclude_company_id, type(exclude_company_id))
         query = {}
         if exclude_company_id:
-            query = {"status": filter, "ordering_company_id": {"$ne": exclude_company_id}}
-        else:
-            query = {"status": filter}
+            query = {"ordering_company_id": {"$ne": exclude_company_id}}
+        if filter:
+            query["status"] = filter 
         print(query, "ofnfonfonf")
         bids = list(bid.find(query).skip(skip).limit(limit))
         for _bid in bids:
