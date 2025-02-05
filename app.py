@@ -342,6 +342,15 @@ def start_server():
         }}))
         return True
 
+    @app.get("/{company_id}/details")
+    async def get_company_details(company_id: int):
+        company = mongo_client.get_collection("company")
+        res = company.find_one({"company_id": company_id})
+        if not res:
+            return {"message": "Company not found"}
+        del res["_id"]
+        return res
+
     @app.get("/healthz")
     async def healthz():
         logger.info(f"health check done, {socket.gethostname()}")
