@@ -293,21 +293,25 @@ def start_server():
 
     @app.post("/register/{company_id}")
     async def register_company(company_id: int, request: RegisterCompany):
-        company = mongo_client.get_collection("company")
-        print(request.dict(), "onfonfonf")
-        res = company.find_one({"company_id": company_id})
-        if res:
-            return {"message": "Company already registered", "success": False}
-        print(company.insert_one(
-            {
-                "mobile_number": request.mobile_number,
-                "company_id": company_id, "name": request.name,
-                "tennet": request.tennet, "created_at": datetime.datetime.now(),
-                "updated_at": datetime.datetime.now(),
-                "rating": 0, "total_bids": 0, "total_wins": 0
-            }
-        ))
-        return {"message": "Company registered", "success": True}
+        try:
+            company = mongo_client.get_collection("company")
+            print(request.dict(), "onfonfonf")
+            res = company.find_one({"company_id": company_id})
+            if res:
+                return {"message": "Company already registered", "success": False}
+            print(company.insert_one(
+                {
+                    "mobile_number": request.mobile_number,
+                    "company_id": company_id, "name": request.name,
+                    "tennet": request.tennet, "created_at": datetime.datetime.now(),
+                    "updated_at": datetime.datetime.now(),
+                    "rating": 0, "total_bids": 0, "total_wins": 0
+                }
+            ))
+            return {"message": "Company registered", "success": True}
+        except Exception as e:
+            print(e)
+            return {"message": "Company not registered", "success": False}
 
     @app.post("/register/{company_id}/phone")
     async def update_phone_number(company_id: int, mobile_number: str):
