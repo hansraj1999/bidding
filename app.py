@@ -80,7 +80,7 @@ def start_server():
         if filter:
             query["status"] = filter 
         print(query, "ofnfonfonf")
-        bids = list(bid.find(query).skip(skip).limit(limit))
+        bids = list(bid.find(query).sort({"updated_at": -1}).skip(skip).limit(limit))
         for _bid in bids:
             del _bid["_id"]
         return {
@@ -214,7 +214,7 @@ def start_server():
         winner = applied_bids.find_one({"bid_id": bid_id, "status": "active", "company_id": winner_company_id})
         if not winner:
             return {"message": "Winner not found"}
-
+        applied_bids.update_one({"bid_id": bid_id, "company_id": winner_company_id}, {"$set": {"is_winner": True, "updated_at": datetime.datetime.now()}})
         company = mongo_client.get_collection("company")
         company.update_one({"company_id": winner_company_id}, {"$set": {
             "total_wins": company.find_one({"company_id": winner_company_id}).get("total_wins", 0) + 1
