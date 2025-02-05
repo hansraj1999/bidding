@@ -2,8 +2,8 @@ from pymongo import MongoClient
 from threading import Lock
 import os
 
-#!/bin/bash
-echo "export mongo_con=mongodb+srv://deghun:fynd1234@bidding.plwrq.mongodb.net/" >> /etc/profile.d/mongo_con.sh
+# #!/bin/bash
+# echo "export mongo_con=mongodb+srv://deghun:fynd1234@bidding.plwrq.mongodb.net/" >> /etc/profile.d/mongo_con.sh
 
 
 class MongoDBClient:
