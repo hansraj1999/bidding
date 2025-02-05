@@ -113,6 +113,7 @@ def start_server():
         external_shipment_id: str = Field(None, description="External Shipment ID of the item")
         delivery_details: dict = Field(None, description="Delivery details of the item")
         article_details: dict = Field(None, description="Article details of the item")
+        item_details: dict = Field(None, description="Item details of the item")
 
     import uuid
 
