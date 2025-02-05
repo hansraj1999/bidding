@@ -26,7 +26,7 @@ def start_server():
     @app.get("/bids/{bid_id}/applied_bids")
     async def get_bids_for_a_bid(bid_id):
         applied_bids = mongo_client.get_collection("applied_bids")
-        res = list(applied_bids.find({"bid_id": bid_id}))
+        res = list(applied_bids.find({"bid_id": bid_id}).sort("created_at", -1))
         if not res:
             return {"message": "No applied bids found"}
         for _bid in res:
@@ -208,7 +208,7 @@ def start_server():
         }})
         bid.update_one({"bid_id": bid_id}, {"$set": {"winner_company_id": winner_company_id, "status": "completed",
         "ordering_company_name": res["company_name"],
-        "winnning_company_name": winner["company_name"],
+        "winnning_company_name": winner["company_name"], "winning_bid_amount": winner["amount"]
                                                      }})
         ledger = mongo_client.get_collection("ledger")
         ledger_id = str(uuid.uuid4())
