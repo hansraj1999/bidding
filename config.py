@@ -22,7 +22,7 @@ class MongoDBClient:
 
     def _init_client(self, uri, database):
         """Initialize MongoDB client"""
-        self.client = MongoClient(uri, maxPoolSize=50, minPoolSize=5, serverSelectionTimeoutMS=5000, tls=True, Ca)
+        self.client = MongoClient(uri, maxPoolSize=50, minPoolSize=5, serverSelectionTimeoutMS=5000)
         self.client = self.client[database]
     
     def get_client(self):
