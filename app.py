@@ -101,6 +101,7 @@ def start_server():
         brand_id: str = Field(None, description="Brand ID of the item")
         fynd_order_id: str = Field(None, description="Order ID from Fynd")
         article_id: str = Field(None, description="Article ID of the item")
+        shipment_id: str = Field(None, description="Shipment ID of the item")
 
     import uuid
 
