@@ -294,6 +294,7 @@ def start_server():
     @app.post("/register/{company_id}")
     async def register_company(company_id: int, request: RegisterCompany):
         company = mongo_client.get_collection("company")
+        print(request.dict(), "onfonfonf")
         res = company.find_one({"company_id": company_id})
         if res:
             return {"message": "Company already registered", "success": False}
