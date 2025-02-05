@@ -130,6 +130,7 @@ def start_server():
         BidRequest["status"] = "active" # enum
         BidRequest["ordering_company_id"] = company
         BidRequest["created_at"] = datetime.datetime.now()
+        BidRequest["updated_at"] = datetime.datetime.now()
         res = bid.insert_one(
             BidRequest
         )
@@ -164,7 +165,11 @@ def start_server():
             if applied_bids.find_one({"bid_id": bid_id, "company_id": company}):
                 return {"message": "Bid is already placed by you cant update it."} # current limitation
             applied_bids.insert_one(
-                {"bid_id": res["bid_id"], "company_id": company, "amount": request.amount, "status": "active", "company_name": name}
+                {
+                    "bid_id": res["bid_id"], "company_id": company, 
+                    "amount": request.amount, "status": "active", "company_name": name,
+                    "created_at": datetime.datetime.now(), "updated_at": datetime.datetime.now()
+                }
             ) # ideally it should be in a separate collection, and race condition should be handled.
 
         except Exception as e:
