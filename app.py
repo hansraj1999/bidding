@@ -77,7 +77,7 @@ def start_server():
         else:
             query = {"status": filter}
         print(query, "ofnfonfonf")
-        bids = list(bid.find(query)).skip(skip).limit(limit)
+        bids = list(bid.find(query).skip(skip).limit(limit))
         for _bid in bids:
             del _bid["_id"]
         return {
