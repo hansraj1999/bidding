@@ -63,14 +63,17 @@ def start_server():
         return res
 
     @app.get("/bids")
-    async def get_gloabl_bids(filter: str ="active", limit: int = 10, page: int = 0):
+    async def get_gloabl_bids(filter: str ="active", limit: int = 10, page: int = 0, exclude_company_id: int = None):
         logger.info(socket.gethostname())
         bid = mongo_client.get_collection("bid")
         if page < 1:
             skip = 0
         else:
             skip = (page - 1) * limit
-        bids = list(bid.find({"status": filter}).skip(skip).limit(limit))
+        if exclude_company_id:
+            bids = list(bid.find({"status": filter, "ordering_company_id": {"$ne": exclude_company_id}}).skip(skip).limit(limit))
+        else:
+            bids = list(bid.find({"status": filter}).skip(skip).limit(limit))
         for _bid in bids:
             del _bid["_id"]
         return {
