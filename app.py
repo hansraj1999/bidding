@@ -285,16 +285,22 @@ def start_server():
             "limit": limit,
             "ledger": res
         }
+    class Utr(BaseModel):
+        utr: str = Field(..., description="ledger id")
 
     @app.post("/{company}/ledger/{ledger_id}")
-    async def payout_ledger(company: int, ledger_id: str):
+    async def payout_ledger(company: int, ledger_id: str, utr: Utr):
         ledger = mongo_client.get_collection("ledger")
         res = ledger.find_one({"ledger_id": ledger_id})
         if company != res.get("ordering_company_id"):
             return {"message": "You can't payout for this ledger"}
         if res["status"] != "active":
             return {"message": "Ledger is already completed"}
-        ledger.update_one({"ledger_id": ledger_id}, {"$set": {"status": "completed", "updated_at": datetime.datetime.now()}})
+        ledger.update_one({
+            "ledger_id": ledger_id},
+              {"$set": {"status": "completed", "updated_at": datetime.datetime.now(),
+            "utr": utr
+        }})
         return {"message": "Payout done successfully"}
 
     @app.post("/{company}/bid/{bid_id}/transfer") # pending. need to implement
