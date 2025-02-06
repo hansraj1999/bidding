@@ -159,6 +159,7 @@ def start_server():
 
     class AddBid(BaseModel):
         amount: float = Field(..., description="Amount for the bid")
+        pdp_link: str = Field(None, description="PDP link of the item")
         # bid_id: str = Field(..., description="bid id")
 
     @app.post("/{company}/bid/{bid_id}")
@@ -191,6 +192,7 @@ def start_server():
                     "is_winner": False,
                     "bid_id": res["bid_id"], "company_id": company, 
                     "amount": request.amount, "status": "active", "company_name": name,
+                    "pdp_link": request.pdp_link,
                     "created_at": datetime.datetime.now(), "updated_at": datetime.datetime.now()
                 }
             ) # ideally it should be in a separate collection, and race condition should be handled.
