@@ -304,9 +304,9 @@ def start_server():
         ledger.update_one({
             "ledger_id": ledger_id},
               {"$set": {"status": "completed", "updated_at": datetime.datetime.now(),
-            "utr": utr
+            "utr": utr.utr
         }})
-        return {"message": "Payout done successfully"}
+        return {"message": "Payout done successfully", "success": True}
 
     @app.post("/{company}/bid/{bid_id}/transfer") # pending. need to implement
     async def transfer_bid_amount(bid_id: str, company_id: int, amount: float):
