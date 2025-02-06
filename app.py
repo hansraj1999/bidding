@@ -210,17 +210,17 @@ def start_server():
         bid = mongo_client.get_collection("bid")
         res = bid.find_one({"bid_id": bid_id})
         if not res:
-            return {"message": "Bid not found"}
+            return {"message": "Bid not found", "success": False}
         if res["ordering_company_id"] != company:
             return {"message": "You can't declare winner for this bid"}
         if res.get("winner_company_id"):
-            return {"message": "Winner is already declared"}
+            return {"message": "Winner is already declared", "success": False}
         if res["status"] != "active":
-            return {"message": "Bid is inactive"}
+            return {"message": "Bid is inactive", "success": False}
         applied_bids = mongo_client.get_collection("applied_bids")
         winner = applied_bids.find_one({"bid_id": bid_id, "status": "active", "company_id": winner_company_id})
         if not winner:
-            return {"message": "Winner not found"}
+            return {"message": "Winner not found", "success": False}
         applied_bids.update_one({"bid_id": bid_id, "company_id": winner_company_id}, {"$set": {"is_winner": True, "updated_at": datetime.datetime.now()}})
         company = mongo_client.get_collection("company")
         company.update_one({"company_id": winner_company_id}, {"$set": {
@@ -249,7 +249,7 @@ def start_server():
                 "new_fynd_order_id": fynd_order_id
             }
         )
-        return {"message": "Winner declared successfully"}
+        return {"message": "Winner declared successfully", "success": True}
 
     @app.get("/{company_id}/ledger")
     async def get_ledger(company_id: int,  page: int=1, limit: int=10, filter: str = 'all'): # filter = all, to_pay, to_be_get_paid, paid
