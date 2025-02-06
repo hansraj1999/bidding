@@ -275,7 +275,7 @@ def start_server():
         else:
             skip = (page - 1) * limit
         print(query, "ofnmmfn")
-        res = list(ledger.find(query).skip(skip).limit(limit))
+        res = list(ledger.find(query).sort({"created_at": -1}).skip(skip).limit(limit))
         for r in res:
             del r["_id"]
 
