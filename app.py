@@ -127,6 +127,7 @@ def start_server():
         delivery_details: dict = Field(None, description="Delivery details of the item")
         article_details: dict = Field(None, description="Article details of the item")
         item_details: dict = Field(None, description="Item details of the item")
+        pdp_link: str = Field(None, description="PDP link of the item")
 
     import uuid
 
