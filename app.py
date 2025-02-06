@@ -204,7 +204,7 @@ def start_server():
         return {"message": "Bid added successfully"}
 
     @app.post("/{company}/bid/{bid_id}/winner")
-    async def propose_winning_company(company: int, bid_id: str, winner_company_id: int):
+    async def propose_winning_company(company: int, bid_id: str, winner_company_id: int, fynd_order_id: str):
         bid = mongo_client.get_collection("bid")
         res = bid.find_one({"bid_id": bid_id})
         if not res:
@@ -224,10 +224,11 @@ def start_server():
         company.update_one({"company_id": winner_company_id}, {"$set": {
             "total_wins": company.find_one({"company_id": winner_company_id}).get("total_wins", 0) + 1
         }})
-        bid.update_one({"bid_id": bid_id}, {"$set": {"winner_company_id": winner_company_id, "status": "completed",
-        "ordering_company_name": res["company_name"],
-        "winnning_company_name": winner["company_name"], "winning_bid_amount": winner["amount"]
-                                                     }})
+        bid.update_one({"bid_id": bid_id}, {"$set": {
+            "winner_company_id": winner_company_id, "status": "completed",
+            "ordering_company_name": res["company_name"], "new_fynd_order_id": fynd_order_id,
+            "winnning_company_name": winner["company_name"], "winning_bid_amount": winner["amount"]
+         }})
         ledger = mongo_client.get_collection("ledger")
         ledger_id = str(uuid.uuid4())
         ledger.insert_one(
@@ -242,7 +243,8 @@ def start_server():
                 "status": "active",
                 "ledger_id": ledger_id,
                 "created_at": datetime.datetime.now(),
-                "updated_at": datetime.datetime.now()
+                "updated_at": datetime.datetime.now(),
+                "new_fynd_order_id": fynd_order_id
             }
         )
         return {"message": "Winner declared successfully"}
