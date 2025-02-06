@@ -268,7 +268,12 @@ def start_server():
                 query["winner_company_id"] = company_id
                 query["status"] = "active"
             elif filter == "paid":
-                query["ordering_company_id"] = company_id
+                query = {
+                    "$or": [
+                        {"ordering_company_id": company_id}, # from 
+                        {"winner_company_id": company_id} # to
+                    ]
+                }
                 query["status"] = "completed"
         if page < 1:
             skip = 0
