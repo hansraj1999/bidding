@@ -178,11 +178,11 @@ def start_server():
             if not res:
                 return {"message": "Bid not found"}
             if request.amount < res["initial_bid_price"]:
-                return {"message": "Bid amount is less than initial bid price"}
+                return {"message": "Bid amount is less than initial bid price", "success": False}
             if res["status"] != "active":
-                return {"message": "Bid is not active"}
+                return {"message": "Bid is not active", "success": False}
             if res["ordering_company_id"] == company:
-                return {"message": "You can't bid on your own bid"}
+                return {"message": "You can't bid on your own bid", "success": False}
 
             applied_bids = mongo_client.get_collection("applied_bids")
             if applied_bids.find_one({"bid_id": bid_id, "company_id": company}):
@@ -201,7 +201,9 @@ def start_server():
         except Exception as e:
             print(traceback.format_exc())
             print(e)
-        return {"message": "Bid added successfully"}
+            return {"message": "Bid Failed", "success": False}
+
+        return {"message": "Bid added successfully", "success": True}
 
     @app.post("/{company}/bid/{bid_id}/winner")
     async def propose_winning_company(company: int, bid_id: str, winner_company_id: int, fynd_order_id: str):
