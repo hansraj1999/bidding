@@ -398,8 +398,11 @@ def start_server():
         if not res:
             return {"message": "Company not found", "success": False}
         del res["_id"]
-        res["success"] = True
-        return res
+        r = {}
+        r["success"] = True
+        r["data"] = res
+       
+        return r
 
     @app.get("/healthz")
     async def healthz():
