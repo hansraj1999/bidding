@@ -299,10 +299,12 @@ def start_server():
     async def payout_ledger(company: int, ledger_id: str, utr: Utr):
         ledger = mongo_client.get_collection("ledger")
         res = ledger.find_one({"ledger_id": ledger_id})
+        if not res:
+            return {"message": "Ledger not found", "success": False}
         if company != res.get("ordering_company_id"):
-            return {"message": "You can't payout for this ledger"}
+            return {"message": "You can't payout for this ledger", "success": False}
         if res["status"] != "active":
-            return {"message": "Ledger is already completed"}
+            return {"message": "Ledger is already completed", "success": False}
         ledger.update_one({
             "ledger_id": ledger_id},
               {"$set": {"status": "completed", "updated_at": datetime.datetime.now(),
@@ -394,8 +396,9 @@ def start_server():
         company = mongo_client.get_collection("company")
         res = company.find_one({"company_id": company_id})
         if not res:
-            return {"message": "Company not found"}
+            return {"message": "Company not found", "success": False}
         del res["_id"]
+        res["success"] = True
         return res
 
     @app.get("/healthz")
