@@ -14,9 +14,7 @@ company_router = APIRouter()
 
 class RegisterCompany(BaseModel):
     name: str = Field(..., description="Name of the company")
-    mobile_number: str = Field(..., description="Mobile number of the company")
     tennet: str = Field("FYND", description="Tennet of the company")
-    mail_id: str = Field(..., description="Mail id of the company")
 
 
 class BankDetails(BaseModel):
@@ -26,6 +24,9 @@ class BankDetails(BaseModel):
     vpa: str = Field(..., description="vpa")
     account_type: str = Field(..., description="account type can be current or saving")
     beneficiary_name: str = Field(..., description="benificary_name")
+    mobile_number: str = Field(..., description="Mobile number of the company")
+    mail_id: str = Field(..., description="Mail id of the company")
+
 
 @company_router.post("/register/{company_id}")
 async def register_company(company_id: int, request: RegisterCompany):
@@ -37,6 +38,8 @@ async def register_company(company_id: int, request: RegisterCompany):
             return {"message": "Company already registered", "success": False}
         print(company.insert_one(
             {
+                "mail_id": request.mail_id,
+                "mobile_number": request.mobile_number,
                 "company_id": company_id, "name": request.name,
                 "tennet": request.tennet, "created_at": datetime.datetime.now(),
                 "updated_at": datetime.datetime.now(),

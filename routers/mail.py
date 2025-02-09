@@ -30,9 +30,10 @@ The FulfilNet Team
 mail_router = APIRouter()
 
 @mail_router.post("/send/email")
-async def send_email(mail_id: str, name, message):
+async def send_email(mail_id: str, message):
     """Send email to a recipient"""
-    await send_email_async(mail_id, name, message)
+    message_bytes = message.encode("utf-8")  # ✅ Fix UnicodeEncodeError
+    await constants.smtp_client.sendmail(constants.sender_email, mail_id, message_bytes)
     return {"message": "Email sent successfully!"}
 
 
