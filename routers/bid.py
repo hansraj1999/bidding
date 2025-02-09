@@ -38,14 +38,15 @@ async def get_bids_for_a_bid(bid_id, limit: int = 10, page: int = 0):
     applied_bids = mongo_client.get_collection("applied_bids")
     res = list(applied_bids.find({"bid_id": bid_id}).sort("updated_at", -1).skip(skip).limit(limit))
     if not res:
-        return {"message": "No applied bids found"}
+        return {"message": "No applied bids found", "success": False}
     for _bid in res:
         del _bid["_id"]
     return {
         "total": applied_bids.count_documents({"bid_id": bid_id}),
         "page": page,
         "limit": limit,
-        "applied_bids": res
+        "applied_bids": res,
+        "success": True
     }
 
 
