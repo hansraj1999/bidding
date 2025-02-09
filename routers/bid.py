@@ -165,7 +165,11 @@ async def create_a_bid(company: int, bid_request: BidRequest): # add validation 
             )
             print(companies)
             from routers.mail import send_bulk_emails
-            await send_bulk_emails([(c["mail_id"], c["name"]) for c in companies], bid_request)
+            res = []
+            for c in companies:
+                if c.get("mail_id"):
+                    res.append((c["mail_id"], c["name"]))
+            await send_bulk_emails(res, bid_request)
 
 
         except Exception as e:
