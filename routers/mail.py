@@ -50,8 +50,17 @@ async def send_email_async(mail_id, name, bid_details):
         display_address=bid_details["delivery_details"]["display_address"]
     )
     message_bytes = message.encode("utf-8")  # ✅ Fix UnicodeEncodeError
+    import aiosmtplib
+    import ssl
+    import certifi
+
+    constants.smtp_client = aiosmtplib.SMTP(hostname=constants.smtp_server, port=constants.port, tls_context=ssl.create_default_context(cafile=certifi.where())) #NOSONAR
+    await constants.smtp_client.connect()
+    await constants.smtp_client.login(constants.sender_email, constants.password)
     await constants.smtp_client.sendmail(constants.sender_email, mail_id, message_bytes)
     print(f"✅ Email sent to {mail_id}")
+    await constants.smtp_client.quit()
+
 
 async def send_bulk_emails(recipients, bid_details):
     """Send emails in parallel asynchronously"""
