@@ -2,7 +2,6 @@ from pymongo import MongoClient
 from threading import Lock
 import os
 
-
 class MongoDBClient:
     _instance = None  # Singleton instance
     _lock = Lock()  # Lock for thread safety
@@ -32,3 +31,11 @@ class MongoDBClient:
         """Close MongoDB connection"""
         if self.client:
             self.client.close()
+
+
+class Constants:
+    port = 587  
+    smtp_server = os.getenv("smtp_server", "smtp.gmail.com")
+    sender_email = os.getenv("sender_email", "")
+    password = os.getenv("password", "")
+    smtp_client = None

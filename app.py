@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import socket
 import datetime
-from backend.handler import mongo_client
+from backend.handler import mongo_client, constants
 from routers import company, ledger, bid
 logger = logging.getLogger(__name__)
 
@@ -26,6 +26,27 @@ def start_server():
     app.include_router(company.company_router)
     app.include_router(bid.bid_router)
     app.include_router(ledger.ledger_router)
+
+
+    @app.on_event("startup")
+    async def startup_event():
+        """Initialize SMTP connection once when the FastAPI app starts."""
+        import aiosmtplib
+        import ssl
+        import certifi
+
+        constants.smtp_client = aiosmtplib.SMTP(hostname=constants.smtp_server, port=constants.port, tls_context=ssl.create_default_context(cafile=certifi.where()))
+        await constants.smtp_client.connect()
+        await constants.smtp_client.login(constants.sender_email, constants.password)
+        print("✅ SMTP Client initialized and connected!")
+
+
+    @app.on_event("shutdown")
+    async def shutdown_event():
+        smtp_client = constants.smtp_client
+        if smtp_client:
+            await smtp_client.quit()
+            print("🔴 SMTP Client disconnected!")
 
     @app.get("/healthz")
     async def healthz():

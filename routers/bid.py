@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
 from backend.handler import mongo_client
 import socket
 import logging
@@ -132,28 +132,49 @@ async def get_applied_bid_by_bid_id(company_id: int, bid_id: str):
 
 @bid_router.post("/{company}/register/bid")
 async def create_a_bid(company: int, bid_request: BidRequest): # add validation for same bid for same article
-    logger.info(socket.gethostname())
-    logger.info(f"Creating bid for company {company} with request: {bid_request}")
-    bid = mongo_client.get_collection("bid")
-    print(bid_request.dict())
-    bid_request = bid_request.dict()
-    c = mongo_client.get_collection("company")
-    cres = c.find_one({"company_id": company})
-    if not cres:
-        return {"message": "Company not found", "success": False}
-    sh = bid.find_one({"shipment_id": bid_request["shipment_id"], "status": "active"})
-    if sh:
-        return {"message": "Bid already exists for this shipment", "success": False}
-    name = cres["name"]
-    bid_request["bid_id"] = str(uuid.uuid4())
-    bid_request["company_name"] = name
-    bid_request["status"] = "active" # enum
-    bid_request["ordering_company_id"] = company
-    bid_request["created_at"] = datetime.datetime.now()
-    bid_request["updated_at"] = datetime.datetime.now()
-    bid.insert_one(
-        bid_request
-    )
+    try:
+        logger.info(socket.gethostname())
+        logger.info(f"Creating bid for company {company} with request: {bid_request}")
+        bid = mongo_client.get_collection("bid")
+        print(bid_request.dict())
+        bid_request = bid_request.dict()
+        c = mongo_client.get_collection("company")
+        cres = c.find_one({"company_id": company})
+        if not cres:
+            return {"message": "Company not found", "success": False}
+        sh = bid.find_one({"shipment_id": bid_request["shipment_id"], "status": "active"})
+        if sh:
+            return {"message": "Bid already exists for this shipment", "success": False}
+        name = cres["name"]
+        bid_request["bid_id"] = str(uuid.uuid4())
+        bid_request["company_name"] = name
+        bid_request["status"] = "active" # enum
+        bid_request["ordering_company_id"] = company
+        bid_request["created_at"] = datetime.datetime.now()
+        bid_request["updated_at"] = datetime.datetime.now()
+        bid.insert_one(
+            bid_request
+        )
+        try:
+            collection = mongo_client.get_collection("company")
+            companies = list(
+                collection.find(
+                    {"company_id": {"$ne": company}},  # Filter
+                    {"mail_id": 1, "name": 1}  # Projection: Only `_id` field
+                ).limit(1000)
+            )
+            print(companies)
+            from routers.mail import send_bulk_emails
+            await send_bulk_emails([(c["mail_id"], c["name"]) for c in companies], bid_request)
+
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            print("comms failed to send", e)
+    except Exception as e:
+        print(e)
+        return {"message": "Bid creation failed", "success": False}
     return {"message": "Bid created successfully", "bid_id": str(bid_request["bid_id"]), "success": True}
 
 
