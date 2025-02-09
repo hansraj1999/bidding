@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import socket
 import datetime
 from backend.handler import mongo_client, constants
-from routers import company, ledger, bid
+from routers import company, ledger, bid, mail
 logger = logging.getLogger(__name__)
 
 
@@ -26,7 +26,7 @@ def start_server():
     app.include_router(company.company_router)
     app.include_router(bid.bid_router)
     app.include_router(ledger.ledger_router)
-
+    app.include_router(mail.mail_router)
 
     @app.on_event("startup")
     async def startup_event():
