@@ -38,8 +38,6 @@ async def register_company(company_id: int, request: RegisterCompany):
             return {"message": "Company already registered", "success": False}
         print(company.insert_one(
             {
-                "mail_id": request.mail_id,
-                "mobile_number": request.mobile_number,
                 "company_id": company_id, "name": request.name,
                 "tennet": request.tennet, "created_at": datetime.datetime.now(),
                 "updated_at": datetime.datetime.now(),
