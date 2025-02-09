@@ -38,6 +38,7 @@ async def register_company(company_id: int, request: RegisterCompany):
             return {"message": "Company already registered", "success": False}
         print(company.insert_one(
             {
+                "is_verified": False,
                 "company_id": company_id, "name": request.name,
                 "tennet": request.tennet, "created_at": datetime.datetime.now(),
                 "updated_at": datetime.datetime.now(),
@@ -63,8 +64,9 @@ async def update_phone_number(company_id: int, mobile_number: str):
 @company_router.post("/register/{company_id}/banking")
 async def add_banking_details(company_id: int, bank_details: BankDetails):
     company = mongo_client.get_collection("company")
+
     print(company.update_one({"company_id": company_id}, {"$set": {
-        **bank_details.dict(),
+        **bank_details.dict(), "is_verified": True,
         "updated_at": datetime.datetime.now()
     }}))
     return {"message": "Bank Details Updated", "success": True}
