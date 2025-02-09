@@ -30,9 +30,9 @@ The FulfilNet Team
 mail_router = APIRouter()
 
 @mail_router.post("/send/email")
-async def send_email(recipient: str, message):
+async def send_email(mail_id: str, name, message):
     """Send email to a recipient"""
-    await send_email_async(recipient, message)
+    await send_email_async(mail_id, name, message)
     return {"message": "Email sent successfully!"}
 
 

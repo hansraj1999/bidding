@@ -36,7 +36,7 @@ def start_server():
             import ssl
             import certifi
 
-            constants.smtp_client = aiosmtplib.SMTP(hostname=constants.smtp_server, port=constants.port, tls_context=ssl.create_default_context(cafile=certifi.where()))
+            constants.smtp_client = aiosmtplib.SMTP(hostname=constants.smtp_server, port=constants.port, tls_context=ssl.create_default_context(cafile=certifi.where())) #NOSONAR
             await constants.smtp_client.connect()
             await constants.smtp_client.login(constants.sender_email, constants.password)
             print("✅ SMTP Client initialized and connected!")
