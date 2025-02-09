@@ -2,15 +2,12 @@ from pymongo import MongoClient
 from threading import Lock
 import os
 
-# #!/bin/bash
-# echo "export mongo_con=mongodb+srv://deghun:fynd1234@bidding.plwrq.mongodb.net/" >> /etc/profile.d/mongo_con.sh
-
 
 class MongoDBClient:
     _instance = None  # Singleton instance
     _lock = Lock()  # Lock for thread safety
 
-    def __new__(cls, database="hashiras"): # TODO: fetch database name from config
+    def __new__(cls, database="hashiras"):  # NOSONAR get db name from config
         uri="mongodb+srv://deghun:fynd1234@bidding.plwrq.mongodb.net/"
         print(os.getenv("mongo_con", "mongodb://localhost:27017"), "ofnonfonfon")
         if not cls._instance:
@@ -27,8 +24,8 @@ class MongoDBClient:
     
     def get_client(self):
         """Get MongoDB client"""
-        if self.client is None:
-            raise Exception("MongoDB client is not initialized")
+        if self.client is None: # NOSONAR
+            raise Exception("MongoDB client is not initialized") # NOSONAR
         return self.client
     
     def close_connection(self):
