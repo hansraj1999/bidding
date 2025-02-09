@@ -30,15 +30,19 @@ def start_server():
 
     @app.on_event("startup")
     async def startup_event():
-        """Initialize SMTP connection once when the FastAPI app starts."""
-        import aiosmtplib
-        import ssl
-        import certifi
+        try:
+            """Initialize SMTP connection once when the FastAPI app starts."""
+            import aiosmtplib
+            import ssl
+            import certifi
 
-        constants.smtp_client = aiosmtplib.SMTP(hostname=constants.smtp_server, port=constants.port, tls_context=ssl.create_default_context(cafile=certifi.where()))
-        await constants.smtp_client.connect()
-        await constants.smtp_client.login(constants.sender_email, constants.password)
-        print("✅ SMTP Client initialized and connected!")
+            constants.smtp_client = aiosmtplib.SMTP(hostname=constants.smtp_server, port=constants.port, tls_context=ssl.create_default_context(cafile=certifi.where()))
+            await constants.smtp_client.connect()
+            await constants.smtp_client.login(constants.sender_email, constants.password)
+            print("✅ SMTP Client initialized and connected!")
+        except Exception as e:
+            print(f"🔴 Error initializing SMTP Client: {e}")
+            
 
 
     @app.on_event("shutdown")
