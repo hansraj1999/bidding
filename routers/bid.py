@@ -30,14 +30,23 @@ class BidRequest(BaseModel):
 
 
 @bid_router.get("/bids/{bid_id}/applied_bids")
-async def get_bids_for_a_bid(bid_id):
+async def get_bids_for_a_bid(bid_id, limit: int = 10, page: int = 0):
+    if page < 1:
+        skip = 0
+    else:
+        skip = (page - 1) * limit
     applied_bids = mongo_client.get_collection("applied_bids")
-    res = list(applied_bids.find({"bid_id": bid_id}).sort("created_at", -1))
+    res = list(applied_bids.find({"bid_id": bid_id}).sort("updated_at", -1).skip(skip).limit(limit))
     if not res:
         return {"message": "No applied bids found"}
     for _bid in res:
         del _bid["_id"]
-    return res
+    return {
+        "total": applied_bids.count_documents({"bid_id": bid_id}),
+        "page": page,
+        "limit": limit,
+        "applied_bids": res
+    }
 
 
 @bid_router.get("/{company_id}/bids")
@@ -51,7 +60,7 @@ async def bids_by_company_id(company_id: int, filter_type: str=None, limit: int 
     query = {"ordering_company_id": company_id}
     if filter_type:
         query["status"] =  filter_type
-    bids = list(bid.find(query).skip(skip).limit(limit))
+    bids = list(bid.find(query).sort({"updated_at": -1}).skip(skip).limit(limit))
     for _bid in bids:
         del _bid["_id"]
     return {
